@@ -42,7 +42,8 @@ export class AwsConfigService {
   }
 
   async getSignedUrl(key) {
-    AWS.config.update(this.awsS3Config);
+    // AWS.config.update(this.awsS3Config);
+    
     return this.s3.getSignedUrl('getObject', {
       Bucket: process.env.AWS_S3_BUCKET_NAME,
       Key: key,

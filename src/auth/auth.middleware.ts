@@ -13,7 +13,7 @@ export class AuthMiddleware implements NestMiddleware {
     }
 
     // Here, you can add additional logic to verify the token, e.g., JWT validation.
-    const decodedData = jwt.decode(token, process.env.SECRET_KEY);
+    const decodedData = jwt.decode(token, process.env.JWT_SECRET);
     req['userData'] = decodedData;
     next();
   }

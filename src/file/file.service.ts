@@ -54,14 +54,13 @@ export class FileService {
 
     const fileKeys = originalFileUrl.split('/');
     const actualKey = fileKeys[fileKeys.length - 1];
-    console.log(actualKey);
     // // get file from s3
     const encryptedBuffer = await this.awsConfigService.getFile(actualKey);
 
-    console.log(encryptedBuffer)
     // // decrypt the buffer
-    // const decryptedBuffer = this.encryptionHelper.decryptBuffer(encryptedBuffer, Buffer.from(fileData.encKey, 'hex'));
+    const decryptedBuffer = this.encryptionHelper.decryptBuffer(encryptedBuffer, Buffer.from(fileData.encKey, 'hex'));
 
+    // console.log(decryptedBuffer)
     // // // upload file with decrypted buffer
     // const fileUrl = await this.awsConfigService.uploadFile(`${fileData.fileName}-dec-${new Date().getTime()}`, decryptedBuffer);
 
