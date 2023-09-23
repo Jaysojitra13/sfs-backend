@@ -18,8 +18,8 @@ export class FileController {
     return this.fileService.uploadFile(file, req['userData']);
   }
 
-  // @Get('view')
-  // async viewFile(@Req() req: Request, @UploadedFile() file: any): Promise<any> {
-  //   return this.fileService.viewFile("650f25e1eb90dca471ca1234");
-  // }
+  @Get('view')
+  async viewFile(@Req() req: Request, @UploadedFile() file: any): Promise<any> {
+    return this.fileService.viewFile("650f25e1eb90dca471ca1234");
+  }
 }

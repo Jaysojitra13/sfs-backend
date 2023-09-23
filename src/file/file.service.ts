@@ -40,59 +40,59 @@ export class FileService {
     }
   }
 
-  // async viewFile(fileId: String): Promise<any> {
+  async viewFile(fileId: String): Promise<any> {
 
-  //   const fileData = await this.fileModel.findOne({ _id : fileId });
+    const fileData = await this.fileModel.findOne({ _id : fileId });
 
-  //   console.log(fileData)
-  //   if (!fileData) {
-  //     throw new HttpException('File not found', HttpStatus.NOT_FOUND);
-  //   }
+    console.log(fileData)
+    if (!fileData) {
+      throw new HttpException('File not found', HttpStatus.NOT_FOUND);
+    }
 
-  //   // decrypt file url
-  //   const originalFileUrl = this.encryptionHelper.decryptBuffer(fileData.url, Buffer.from(fileData.encKey, 'hex'));
+    // decrypt file url
+    const originalFileUrl = this.encryptionHelper.decryptBuffer(fileData.url, Buffer.from(fileData.encKey, 'hex'));
 
-  //   const fileKeys = originalFileUrl.split('/');
-  //   const actualKey = fileKeys[fileKeys.length - 1];
-  //   console.log(actualKey);
-  //   // // get file from s3
-  //   const encryptedBuffer = await this.awsConfigService.getFile(actualKey);
+    const fileKeys = originalFileUrl.split('/');
+    const actualKey = fileKeys[fileKeys.length - 1];
+    console.log(actualKey);
+    // // get file from s3
+    const encryptedBuffer = await this.awsConfigService.getFile(actualKey);
 
-  //   console.log(encryptedBuffer)
-  //   // // decrypt the buffer
-  //   // const decryptedBuffer = this.encryptionHelper.decryptBuffer(encryptedBuffer, Buffer.from(fileData.encKey, 'hex'));
+    console.log(encryptedBuffer)
+    // // decrypt the buffer
+    // const decryptedBuffer = this.encryptionHelper.decryptBuffer(encryptedBuffer, Buffer.from(fileData.encKey, 'hex'));
 
-  //   // // // upload file with decrypted buffer
-  //   // const fileUrl = await this.awsConfigService.uploadFile(`${fileData.fileName}-dec-${new Date().getTime()}`, decryptedBuffer);
+    // // // upload file with decrypted buffer
+    // const fileUrl = await this.awsConfigService.uploadFile(`${fileData.fileName}-dec-${new Date().getTime()}`, decryptedBuffer);
 
-  //   // console.log(fileUrl);
-  //   // const preSignedUrl = await this.awsConfigService.getSignedUrl(fileUrl);
+    // console.log(fileUrl);
+    // const preSignedUrl = await this.awsConfigService.getSignedUrl(fileUrl);
 
-  //   // console.log(preSignedUrl)
-  //   // const { encrypted: encryptedBuffer, iv } = this.encryptionHelper.encryptBuffer(buffer);
-  //   // const dec = this.encryptionHelper.decryptBuffer(encryptedBuffer, iv);
+    // console.log(preSignedUrl)
+    // const { encrypted: encryptedBuffer, iv } = this.encryptionHelper.encryptBuffer(buffer);
+    // const dec = this.encryptionHelper.decryptBuffer(encryptedBuffer, iv);
 
-  //   // const fileUrl = await this.awsConfigService.uploadFile(`${originalname}-${new Date().getTime()}`, encryptedBuffer);
+    // const fileUrl = await this.awsConfigService.uploadFile(`${originalname}-${new Date().getTime()}`, encryptedBuffer);
 
-  //   // const { encrypted: encUrl } = this.encryptionHelper.encryptBuffer(fileUrl);
+    // const { encrypted: encUrl } = this.encryptionHelper.encryptBuffer(fileUrl);
 
-  //   // console.log(encUrl);
+    // console.log(encUrl);
 
-  //   // const fileObjToSave: File = {
-  //   //   fileName: originalname,
-  //   //   mime: mimetype,
-  //   //   size,
-  //   //   encKey: iv.toString('hex'),
-  //   //   url: encUrl,
-  //   //   userId: userData._id
-  //   // };
+    // const fileObjToSave: File = {
+    //   fileName: originalname,
+    //   mime: mimetype,
+    //   size,
+    //   encKey: iv.toString('hex'),
+    //   url: encUrl,
+    //   userId: userData._id
+    // };
 
-  //   // const objToSave = new this.fileModel(fileObjToSave);
-  //   // await objToSave.save();
+    // const objToSave = new this.fileModel(fileObjToSave);
+    // await objToSave.save();
 
-  //   return {
-  //     message: "File Uploaded Successfully."
-  //   }
-  // }
+    return {
+      message: "File Uploaded Successfully."
+    }
+  }
 
 }
