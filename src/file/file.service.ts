@@ -41,7 +41,8 @@ export class FileService {
     await objToSave.save();
 
     return {
-      message: "File Uploaded Successfully."
+      message: "File Uploaded Successfully.",
+      status: true
     }
   }
 
@@ -53,6 +54,7 @@ export class FileService {
       throw new HttpException('File not found', HttpStatus.NOT_FOUND);
     }
 
+    console.log("123 => ", fileData);
     // decrypt file url
     const originalFileUrl = this.encryptionHelper.decryptBuffer(fileData.url, Buffer.from(fileData.encKey, 'hex'));
 
