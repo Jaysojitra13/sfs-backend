@@ -5,18 +5,15 @@ import { User } from './auth.interface';
 
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Post('/sign-up')
   async SignUp(@Body() signUpDto: SignUpDto): Promise<User> {
-      return this.authService.signUp(signUpDto);
+    return this.authService.signUp(signUpDto);
   }
 
   @Post('/login')
   async Login(@Body() loginDto: LogInDto): Promise<User> {
-      return this.authService.login(loginDto);
+    return this.authService.login(loginDto);
   }
-
 }

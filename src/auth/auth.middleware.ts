@@ -9,11 +9,13 @@ export class AuthMiddleware implements NestMiddleware {
     const token = req.header('Authorization');
 
     if (!token) {
-      return res.status(401).json({ message: 'Unauthorized: Token not provided' });
+      return res
+        .status(401)
+        .json({ message: 'Unauthorized: Token not provided' });
     }
 
     // Here, you can add additional logic to verify the token, e.g., JWT validation.
-    const decodedData = jwt.decode(token, process.env.JWT_SECRET);
+    const decodedData = jwt.decode(token, {});
     req['userData'] = decodedData;
     next();
   }

@@ -10,18 +10,24 @@ export class FileService {
   constructor(
     @InjectModel('file') private readonly fileModel: Model<File>,
     private readonly awsConfigService: AwsConfigService,
-    private readonly encryptionHelper: EncryptionHelper
+    private readonly encryptionHelper: EncryptionHelper,
   ) {}
 
   async uploadFile(file: any, userData): Promise<any> {
-
     const { originalname, mimetype, buffer, size } = file;
 
-    const { encrypted: encryptedBuffer, iv } = this.encryptionHelper.encryptBuffer(buffer);
+    const { encrypted: encryptedBuffer, iv } =
+      this.encryptionHelper.encryptBuffer(buffer);
 
-    const fileUrl = await this.awsConfigService.uploadFile(`${originalname}-${new Date().getTime()}`, encryptedBuffer);
+    const fileUrl = await this.awsConfigService.uploadFile(
+      `${originalname}-${new Date().getTime()}`,
+      encryptedBuffer,
+    );
 
-    const { encrypted: encUrl } = this.encryptionHelper.encryptBuffer(fileUrl, iv);
+    const { encrypted: encUrl } = this.encryptionHelper.encryptBuffer(
+      fileUrl,
+      iv,
+    );
 
     const fileObjToSave: File = {
       fileName: originalname,
@@ -29,36 +35,40 @@ export class FileService {
       size,
       encKey: iv.toString('hex'),
       url: encUrl,
-      userId: userData._id
+      userId: userData._id,
     };
 
     const objToSave = new this.fileModel(fileObjToSave);
     await objToSave.save();
 
     return {
-      message: "File Uploaded Successfully."
-    }
+      message: 'File Uploaded Successfully.',
+    };
   }
 
-  async viewFile(fileId: String): Promise<any> {
+  async viewFile(fileId: string): Promise<any> {
+    const fileData = await this.fileModel.findOne({ _id: fileId });
 
-    const fileData = await this.fileModel.findOne({ _id : fileId });
-
-    console.log(fileData)
+    console.log(fileData);
     if (!fileData) {
       throw new HttpException('File not found', HttpStatus.NOT_FOUND);
     }
 
     // decrypt file url
-    const originalFileUrl = this.encryptionHelper.decryptBuffer(fileData.url, Buffer.from(fileData.encKey, 'hex'));
+    const originalFileUrl = this.encryptionHelper.decryptBuffer(
+      fileData.url,
+      Buffer.from(fileData.encKey, 'hex'),
+    );
 
     const fileKeys = originalFileUrl.split('/');
     const actualKey = fileKeys[fileKeys.length - 1];
     // // get file from s3
     const encryptedBuffer = await this.awsConfigService.getFile(actualKey);
-
     // // decrypt the buffer
-    const decryptedBuffer = this.encryptionHelper.decryptBuffer(encryptedBuffer, Buffer.from(fileData.encKey, 'hex'));
+    const decryptedBuffer = this.encryptionHelper.decryptBuffer(
+      encryptedBuffer,
+      Buffer.from(fileData.encKey, 'hex'),
+    );
 
     // console.log(decryptedBuffer)
     // // // upload file with decrypted buffer
@@ -90,8 +100,7 @@ export class FileService {
     // await objToSave.save();
 
     return {
-      message: "File Uploaded Successfully."
-    }
+      message: 'File Uploaded Successfully.',
+    };
   }
-
 }

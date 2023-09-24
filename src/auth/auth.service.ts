@@ -14,7 +14,10 @@ export class AuthService {
     // check duplicate email
     const userExists = await this.userModel.findOne({ email: userObj.email });
     if (userExists) {
-      throw new HttpException('User already exists with this email', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        'User already exists with this email',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     userObj.password = passwordHash.generate(userObj.password, {
@@ -26,7 +29,7 @@ export class AuthService {
     return {
       _id: objToSave._id,
       fullName: objToSave.fullName,
-      email: objToSave.email
+      email: objToSave.email,
     };
   }
 
@@ -38,14 +41,16 @@ export class AuthService {
     }
 
     if (passwordHash.verify(userObj.password, userExists.password)) {
-
       // generate token
-      const token = jwt.sign({ email: userExists.email, _id: userExists._id }, process.env.JWT_SECRET)
+      const token = jwt.sign(
+        { email: userExists.email, _id: userExists._id },
+        process.env.JWT_SECRET,
+      );
       return {
         _id: userExists._id,
         email: userExists.email,
         fullName: userExists.fullName,
-        token
+        token,
       };
     } else {
       throw new HttpException('Invalid Password', HttpStatus.BAD_REQUEST);

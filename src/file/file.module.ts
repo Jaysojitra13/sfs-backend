@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module,  } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { FileService } from './file.service';
 import { FileController } from './file.controller';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -10,9 +10,6 @@ import { AuthMiddleware } from 'src/auth/auth.middleware';
 @Module({
   imports: [MongooseModule.forFeature([{ name: 'file', schema: FileSchema }])],
   providers: [FileService, AwsConfigService, EncryptionHelper],
-  controllers: [FileController]
+  controllers: [FileController],
 })
-export class FileModule {
-  
-  
-}
+export class FileModule {}

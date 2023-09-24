@@ -6,7 +6,7 @@ import * as AWS from 'aws-sdk';
 export class AwsConfigService {
   private readonly awsS3Config: AWS.S3.Types.ClientConfiguration;
 
-  public 
+  public;
   s3 = new AWS.S3();
   constructor() {
     this.awsS3Config = {
@@ -35,7 +35,7 @@ export class AwsConfigService {
       Bucket: process.env.AWS_S3_BUCKET_NAME,
       Key: key,
     };
-    
+
     const result = await this.s3.getObject(params).promise();
 
     return result.Body;
@@ -43,7 +43,7 @@ export class AwsConfigService {
 
   async getSignedUrl(key) {
     // AWS.config.update(this.awsS3Config);
-    
+
     return this.s3.getSignedUrl('getObject', {
       Bucket: process.env.AWS_S3_BUCKET_NAME,
       Key: key,

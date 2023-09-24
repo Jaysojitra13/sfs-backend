@@ -3,25 +3,25 @@ import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 export class SignUpDto {
   @IsNotEmpty()
   @IsString()
-  fullName: String;
+  fullName: string;
 
   @IsNotEmpty()
   @IsString()
   @IsEmail()
-  email: String;
+  email: string;
 
   @IsNotEmpty()
   @IsString()
-  password: String;
+  password: string;
 }
 
 export class LogInDto {
   @IsNotEmpty()
   @IsString()
   @IsEmail()
-  email: String;
+  email: string;
 
   @IsNotEmpty()
   @IsString()
-  password: String;
+  password: string;
 }
