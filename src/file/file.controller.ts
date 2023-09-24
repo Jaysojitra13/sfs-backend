@@ -1,7 +1,8 @@
-import { Controller, Post, Get, UseInterceptors, UploadedFile, HttpException, HttpStatus, Req } from '@nestjs/common';
+import { Controller, Post, Get, UseInterceptors, UploadedFile, HttpException, HttpStatus, Req, Param, Body, Put } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { File } from './file.interface';
 import { FileService } from './file.service';
+import { UpdateFileNameDto } from './file.dto';
 
 @Controller('file')
 export class FileController {
@@ -18,8 +19,18 @@ export class FileController {
     return this.fileService.uploadFile(file, req['userData']);
   }
 
-  @Get('view')
-  async viewFile(@Req() req: Request, @UploadedFile() file: any): Promise<any> {
-    return this.fileService.viewFile("650f25e1eb90dca471ca1234");
+  @Get('view/:id')
+  async viewFile(@Param('id') id: string): Promise<any> {
+    return this.fileService.viewFile(id);
+  }
+
+  @Put('update')
+  async updateFile(@Body() udpateFileDto: UpdateFileNameDto): Promise<any> {
+    return this.fileService.updateFile(udpateFileDto);
+  }
+
+  @Get('list')
+  async getFileList(@Req() req: Request): Promise<any> {
+    return this.fileService.getFileList(req['userData']);
   }
 }

@@ -4,6 +4,7 @@ import { Model, Types } from 'mongoose';
 import { File } from './file.interface';
 import { AwsConfigService } from '../common/aws.config';
 import { EncryptionHelper } from '../common/encrypt.helper';
+import { UpdateFileNameDto } from './file.dto';
 
 @Injectable()
 export class FileService {
@@ -17,9 +18,13 @@ export class FileService {
 
     const { originalname, mimetype, buffer, size } = file;
 
-    const { encrypted: encryptedBuffer, iv } = this.encryptionHelper.encryptBuffer(buffer);
+    // conver buffer to hex string
+    const hexBufferString = buffer.toString('hex');
+    const { encrypted: encryptedBuffer, iv } = this.encryptionHelper.encryptBuffer(hexBufferString);
 
-    const fileUrl = await this.awsConfigService.uploadFile(`${originalname}-${new Date().getTime()}`, encryptedBuffer);
+    // Get encrypted buffer from enc hex
+    const encBuffer = Buffer.from(encryptedBuffer, 'hex');
+    const fileUrl = await this.awsConfigService.uploadFile(`${new Date().getTime()}-${originalname}`, encBuffer);
 
     const { encrypted: encUrl } = this.encryptionHelper.encryptBuffer(fileUrl, iv);
 
@@ -44,7 +49,6 @@ export class FileService {
 
     const fileData = await this.fileModel.findOne({ _id : fileId });
 
-    console.log(fileData)
     if (!fileData) {
       throw new HttpException('File not found', HttpStatus.NOT_FOUND);
     }
@@ -52,46 +56,45 @@ export class FileService {
     // decrypt file url
     const originalFileUrl = this.encryptionHelper.decryptBuffer(fileData.url, Buffer.from(fileData.encKey, 'hex'));
 
-    const fileKeys = originalFileUrl.split('/');
-    const actualKey = fileKeys[fileKeys.length - 1];
-    // // get file from s3
-    const encryptedBuffer = await this.awsConfigService.getFile(actualKey);
+    const splittedKeys = originalFileUrl.split('/');
+    const actualKey = splittedKeys[splittedKeys.length - 1];
 
-    // // decrypt the buffer
-    const decryptedBuffer = this.encryptionHelper.decryptBuffer(encryptedBuffer, Buffer.from(fileData.encKey, 'hex'));
+    // get file from s3
+    const encryptedBuffer: any = await this.awsConfigService.getFile(actualKey);
+    // decrypt the buffer
+    const encBufferHexString : any = Buffer.from(encryptedBuffer, 'hex');
+    const decryptedHexBuffer = this.encryptionHelper.decryptBuffer(encBufferHexString, Buffer.from(fileData.encKey, 'hex'));
 
-    // console.log(decryptedBuffer)
-    // // // upload file with decrypted buffer
-    // const fileUrl = await this.awsConfigService.uploadFile(`${fileData.fileName}-dec-${new Date().getTime()}`, decryptedBuffer);
+    //  upload file with decrypted buffer
+    const newFileKey = `${new Date().getTime()}-dec-${fileData.fileName}`;
+    const originalBuffer = Buffer.from(decryptedHexBuffer, 'hex');
+    const fileUrl = await this.awsConfigService.uploadFile(newFileKey, originalBuffer);
 
-    // console.log(fileUrl);
-    // const preSignedUrl = await this.awsConfigService.getSignedUrl(fileUrl);
-
-    // console.log(preSignedUrl)
-    // const { encrypted: encryptedBuffer, iv } = this.encryptionHelper.encryptBuffer(buffer);
-    // const dec = this.encryptionHelper.decryptBuffer(encryptedBuffer, iv);
-
-    // const fileUrl = await this.awsConfigService.uploadFile(`${originalname}-${new Date().getTime()}`, encryptedBuffer);
-
-    // const { encrypted: encUrl } = this.encryptionHelper.encryptBuffer(fileUrl);
-
-    // console.log(encUrl);
-
-    // const fileObjToSave: File = {
-    //   fileName: originalname,
-    //   mime: mimetype,
-    //   size,
-    //   encKey: iv.toString('hex'),
-    //   url: encUrl,
-    //   userId: userData._id
-    // };
-
-    // const objToSave = new this.fileModel(fileObjToSave);
-    // await objToSave.save();
+    const preSignedUrl = await this.awsConfigService.getSignedUrl(newFileKey);
 
     return {
-      message: "File Uploaded Successfully."
+      message: "File downloaded Successfully.",
+      url: preSignedUrl
     }
   }
 
+  async updateFile(updateFileObj: UpdateFileNameDto) {
+
+    const fileData = await this.fileModel.findOne({ _id : updateFileObj.fileId });
+
+    if (!fileData) {
+      throw new HttpException('File not found', HttpStatus.NOT_FOUND);
+    }
+
+    await this.fileModel.updateOne({ _id: updateFileObj.fileId }, { $set: { fileName: updateFileObj.fileName }});
+
+    return {
+      message: "File Updated Successfully"
+    }
+  }
+
+  async getFileList(userData) {
+    const fileData = await this.fileModel.find({ userId: userData._id }, { _id: 1, fileName: 1, size: 1, mime: 1});
+    return fileData;
+  }
 }

@@ -1,7 +1,7 @@
 import * as mongoose from 'mongoose';
 
 export const FileSchema = new mongoose.Schema({
-  fileNmae: String,
+  fileName: String,
   url: String,
   mime: String,
   size: Number,
